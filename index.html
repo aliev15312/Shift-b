@@ -759,15 +759,16 @@ footer b{color:var(--text)}
     }
     return { cur: cur, next: next };
   }
-  function human(ms) {
-    var mins = Math.max(0, Math.round(ms / 60000));
-    var h = Math.floor(mins / 60), m = mins % 60;
-    if (h >= 24) {
-      var days = Math.floor(h / 24);
-      return days + (days === 1 ? " day " : " days ") + (h % 24) + " h";
-    }
-    if (h === 0) return m + " min";
-    return h + " h " + m + " min";
+  function clock(ms) {
+    var t = Math.max(0, Math.floor(ms / 1000));
+    var d = Math.floor(t / 86400);
+    var h = Math.floor((t % 86400) / 3600);
+    var m = Math.floor((t % 3600) / 60);
+    var sec = t % 60;
+    return (d ? d + (d === 1 ? " day " : " days ") : "") +
+           String(h).padStart(2, "0") + ":" +
+           String(m).padStart(2, "0") + ":" +
+           String(sec).padStart(2, "0");
   }
 
   /* ================= status card ================= */
@@ -800,16 +801,6 @@ footer b{color:var(--text)}
       : nextCode === "L" ? len + " days of leave"
       : len + " × " + NAME[nextCode].toLowerCase();
 
-    var cn = currentOrNext(), countLine;
-    if (cn.cur) {
-      countLine = "On shift now — ends in <b>" + human(cn.cur.end - Date.now()) + "</b>";
-    } else if (cn.next) {
-      countLine = NAME[cn.next.code] + " starts in <b>" + human(cn.next.start - Date.now()) + "</b>" +
-                  " · " + wdName(cn.next.start) + " " + cn.next.start.getDate() + " " + MONTHS[cn.next.start.getMonth()];
-    } else {
-      countLine = "No shift scheduled";
-    }
-
     var hol = HOLIDAYS[todayKey];
     st.innerHTML =
       '<div class="status-top">' +
@@ -823,12 +814,37 @@ footer b{color:var(--text)}
         '</div>' +
       '</div>' +
       '<div class="status-next">' +
-        '<div class="count">' + countLine + '</div>' +
+        '<div class="count" id="count"></div>' +
         '<div>Then <b>' + blockTxt + '</b> from ' + wdName(nextDate) + ' ' +
           nextDate.getDate() + ' ' + MONTHS[nextDate.getMonth()] +
           (hol ? '.<br>Today is a UAE public holiday: <b>' + hol[0] + '</b>' : '') +
         '</div>' +
       '</div>';
+  }
+
+  function tickCount() {
+    var el = document.getElementById("count");
+    if (!el) return;
+    var cn = currentOrNext();
+    if (cn.cur) {
+      el.innerHTML = "On shift — ends in <b>" + clock(cn.cur.end - Date.now()) + "</b>";
+    } else if (cn.next) {
+      el.innerHTML = NAME[cn.next.code] + " in <b>" + clock(cn.next.start - Date.now()) + "</b>" +
+        " · " + wdName(cn.next.start) + " " + cn.next.start.getDate() + " " + MONTHS[cn.next.start.getMonth()];
+    } else {
+      el.textContent = "No shift scheduled";
+    }
+  }
+
+  function checkRollover() {
+    var n = new Date();
+    if (n.getFullYear() !== TY || n.getMonth() !== TM || n.getDate() !== TD) {
+      TY = n.getFullYear(); TM = n.getMonth(); TD = n.getDate();
+      todayKey = key(TY, TM, TD);
+      renderAll();
+      return true;
+    }
+    return false;
   }
 
   /* ================= 7-day strip ================= */
@@ -926,9 +942,18 @@ footer b{color:var(--text)}
     pastToggle.textContent = showPast ? "Hide earlier months" : "Show earlier months";
   }
 
-  function renderAll() { renderStatus(); renderStrip(); renderMonths(); }
+  function renderAll() { renderStatus(); tickCount(); renderStrip(); renderMonths(); }
   renderAll();
-  setInterval(renderStatus, 30000);
+
+  setInterval(function () {
+    if (document.hidden) return;
+    if (!checkRollover()) tickCount();
+  }, 1000);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) return;
+    if (!checkRollover()) { renderStatus(); tickCount(); }
+  });
 
   pastToggle.addEventListener("click", function () {
     showPast = !showPast;
