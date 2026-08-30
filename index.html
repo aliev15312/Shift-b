@@ -32,6 +32,9 @@
   --night-bg:#dde0f3;
   --night-line:#b9c0e6;
   --off-text:#8a939f;
+  --leave:#1d6b4f;
+  --leave-bg:#d6ebe0;
+  --leave-line:#a8d3c0;
   --holiday:#a33a2e;
   --today:#0b6f5e;
   --today-soft:#d4ece6;
@@ -52,6 +55,9 @@
     --night-bg:#232a5e;
     --night-line:#343d80;
     --off-text:#6c7583;
+    --leave:#5fd3a4;
+    --leave-bg:#12392b;
+    --leave-line:#1e5a44;
     --holiday:#ec8172;
     --today:#39c9ab;
     --today-soft:#123a33;
@@ -72,6 +78,9 @@
   --night-bg:#232a5e;
   --night-line:#343d80;
   --off-text:#6c7583;
+  --leave:#5fd3a4;
+  --leave-bg:#12392b;
+  --leave-line:#1e5a44;
   --holiday:#ec8172;
   --today:#39c9ab;
   --today-soft:#123a33;
@@ -121,10 +130,7 @@ h1{
   content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;
   border-radius:0 3px 3px 0;background:var(--today);
 }
-.quote blockquote{
-  margin:0;font-size:15.5px;line-height:1.5;font-style:italic;
-  text-wrap:pretty;
-}
+.quote blockquote{margin:0;font-size:15.5px;line-height:1.5;font-style:italic;text-wrap:pretty}
 .quote figcaption{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
@@ -151,30 +157,31 @@ h1{
 }
 .status-hours{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
-  font-size:13px;color:var(--muted);margin-top:4px;
-  font-variant-numeric:tabular-nums;
+  font-size:13px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums;
 }
-.status-date{
-  text-align:right;font-size:12.5px;color:var(--muted);line-height:1.35;
-  flex-shrink:0;
+.status-date{text-align:right;font-size:12.5px;color:var(--muted);line-height:1.35;flex-shrink:0}
+.status-date strong{
+  display:block;font-size:22px;color:var(--text);font-weight:600;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
 }
-.status-date strong{display:block;font-size:22px;color:var(--text);font-weight:600;
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 .status-next{
   border-top:1px solid var(--line);padding-top:12px;
   font-size:13.5px;color:var(--muted);
+  display:flex;flex-direction:column;gap:4px;
 }
 .status-next b{color:var(--text);font-weight:600}
+.count{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:15px;color:var(--today);font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
 .is-day .status-shift{color:var(--day)}
 .is-night .status-shift{color:var(--night)}
 .is-off .status-shift{color:var(--text)}
+.is-leave .status-shift{color:var(--leave)}
 
 /* ---------- 7 day strip ---------- */
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.strip .s{
-  border-radius:11px;padding:8px 2px 7px;text-align:center;
-  border:1px solid transparent;
-}
+.strip .s{border-radius:11px;padding:8px 2px 7px;text-align:center;border:1px solid transparent}
 .strip .wd{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;
@@ -194,8 +201,8 @@ h1{
 .chip .swD{background:var(--day-bg);border:1px solid var(--day-line)}
 .chip .swN{background:var(--night-bg);border:1px solid var(--night-line)}
 .chip .swO{background:var(--surface-2);border:1px solid var(--line)}
+.chip .swL{background:var(--leave-bg);border:1px solid var(--leave-line)}
 .chip .swH{background:var(--holiday);border-radius:50%}
-
 
 /* ---------- contacts ---------- */
 .contacts{
@@ -213,9 +220,7 @@ h1{
   color:inherit;text-decoration:none;
 }
 .c-row:first-of-type{border-top:none}
-.c-role{
-  font-size:13px;color:var(--muted);flex:1;min-width:0;
-}
+.c-role{font-size:13px;color:var(--muted);flex:1;min-width:0}
 .c-val{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:14.5px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:.02em;
@@ -230,34 +235,50 @@ a.c-row .c-val{color:var(--today)}
 .c-call svg{width:15px;height:15px}
 a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-radius:10px}
 
-/* ---------- months ---------- */
-.year-rule{
-  display:flex;align-items:center;gap:12px;margin-top:4px;
+/* ---------- calendar export ---------- */
+.export{
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:16px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;
 }
+.export h2{
+  font-family:"Bricolage Grotesque","Public Sans",sans-serif;
+  font-size:16px;font-weight:600;margin:0;letter-spacing:-.01em;
+}
+.export p{margin:0;font-size:13px;color:var(--muted)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  border:1px solid var(--today);background:var(--today-soft);color:var(--today);
+  border-radius:13px;padding:12px 14px;cursor:pointer;text-decoration:none;
+  font-family:"Public Sans",sans-serif;font-size:14.5px;font-weight:600;
+}
+.btn svg{width:16px;height:16px}
+.btn:focus-visible{outline:2px solid var(--today);outline-offset:2px}
+
+/* ---------- months ---------- */
+.year-rule{display:flex;align-items:center;gap:12px;margin:4px 0 0}
 .year-rule span{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:11px;letter-spacing:.2em;color:var(--muted);
 }
 .year-rule::after{content:"";flex:1;height:1px;background:var(--line)}
-
+#months{display:flex;flex-direction:column;gap:16px}
 .month{
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:18px;
   padding:15px 14px 13px;
   box-shadow:var(--shadow);
+  scroll-margin-top:12px;
 }
-.mhead{
-  display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:11px;
-}
+.mhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:11px}
 .mname{
   font-family:"Bricolage Grotesque","Public Sans",sans-serif;
   font-weight:600;font-size:17px;letter-spacing:-.01em;
 }
 .mstat{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
-  font-size:10.5px;letter-spacing:.06em;color:var(--muted);
-  font-variant-numeric:tabular-nums;
+  font-size:10.5px;letter-spacing:.06em;color:var(--muted);font-variant-numeric:tabular-nums;
 }
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .wdh{
@@ -268,21 +289,26 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
   position:relative;aspect-ratio:1/1.06;border-radius:10px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   border:1px solid transparent;
+  font:inherit;padding:0;cursor:pointer;
 }
-.cell.blank{background:none;border:none}
+.cell.blank{background:none;border:none;cursor:default}
 .n{font-size:14.5px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
 .c{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:8px;letter-spacing:.11em;line-height:1}
 .D{background:var(--day-bg);border-color:var(--day-line);color:var(--day)}
 .N{background:var(--night-bg);border-color:var(--night-line);color:var(--night)}
 .O{background:var(--surface-2);border-color:var(--line);color:var(--off-text)}
+.L{background:var(--leave-bg);border-color:var(--leave-line);color:var(--leave)}
 .cell.hol::after{
   content:"";position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;
   background:var(--holiday);
 }
-.cell.today{
-  outline:2px solid var(--today);outline-offset:1px;
+.cell.edited::before{
+  content:"";position:absolute;left:5px;top:5px;width:0;height:0;
+  border-left:6px solid currentColor;border-bottom:6px solid transparent;opacity:.75;
 }
+.cell.today{outline:2px solid var(--today);outline-offset:1px}
 .cell.today .n{color:var(--today)}
+.cell:focus-visible{outline:2px solid var(--today);outline-offset:2px}
 .hols{
   margin-top:11px;padding-top:10px;border-top:1px solid var(--line);
   display:flex;flex-direction:column;gap:5px;
@@ -293,24 +319,32 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
   flex-shrink:0;min-width:44px;font-variant-numeric:tabular-nums;
 }
 .hol-line .hn small{color:var(--muted);font-size:11px}
+.past-toggle{
+  align-self:center;border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:999px;padding:7px 15px;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.06em;
+}
+.past-toggle:focus-visible{outline:2px solid var(--today);outline-offset:2px}
 
-/* ---------- install: floating button + sheet ---------- */
-.fab{
+/* ---------- floating buttons ---------- */
+.fabs{
   position:fixed;left:50%;transform:translateX(-50%);
   bottom:calc(16px + env(safe-area-inset-bottom));
-  z-index:40;
+  z-index:40;display:flex;gap:8px;
+}
+.fab{
   display:inline-flex;align-items:center;gap:9px;
-  border:1px solid var(--today);
-  background:var(--today);
-  color:var(--bg);
+  border:1px solid var(--today);background:var(--today);color:var(--bg);
   font-family:"Public Sans",sans-serif;font-size:14.5px;font-weight:600;
   border-radius:999px;padding:12px 20px;cursor:pointer;
   box-shadow:0 6px 24px rgba(0,0,0,.28);
 }
+.fab.ghost{background:var(--surface);color:var(--text);border-color:var(--line)}
 .fab svg{width:17px;height:17px;flex-shrink:0}
 .fab:focus-visible{outline:3px solid var(--today);outline-offset:3px}
 .fab[hidden]{display:none!important}
 
+/* ---------- sheets ---------- */
 .scrim{
   position:fixed;inset:0;z-index:50;
   background:rgba(6,9,13,.62);
@@ -331,10 +365,7 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
 @keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .sheet-grab{width:38px;height:4px;border-radius:2px;background:var(--line);align-self:center}
 .sheet-hd{display:flex;align-items:center;gap:13px}
-.appicon{
-  width:56px;height:56px;border-radius:14px;flex-shrink:0;
-  box-shadow:0 2px 10px rgba(0,0,0,.22);
-}
+.appicon{width:56px;height:56px;border-radius:14px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.22)}
 .sheet h2{
   font-family:"Bricolage Grotesque","Public Sans",sans-serif;
   font-size:20px;font-weight:800;margin:0;letter-spacing:-.015em;text-wrap:balance;
@@ -367,9 +398,7 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
   border:1px solid var(--line);background:transparent;color:var(--muted);
   border-radius:11px;padding:9px 10px;cursor:pointer;
 }
-.picker button[aria-selected="true"]{
-  background:var(--today-soft);border-color:var(--today);color:var(--today);
-}
+.picker button[aria-selected="true"]{background:var(--today-soft);border-color:var(--today);color:var(--today)}
 .picker button:focus-visible{outline:2px solid var(--today);outline-offset:2px}
 .go{
   width:100%;border:none;border-radius:13px;padding:14px;cursor:pointer;
@@ -382,13 +411,26 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
 }
 .close:focus-visible,.go:focus-visible{outline:2px solid var(--today);outline-offset:2px}
 
+/* day-mark sheet */
+.marks{display:flex;flex-direction:column;gap:8px}
+.mark-btn{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  border:1px solid var(--line);background:transparent;color:var(--text);
+  border-radius:13px;padding:12px 14px;cursor:pointer;
+  font-family:"Public Sans",sans-serif;font-size:14.5px;font-weight:500;
+}
+.mark-btn i{width:16px;height:16px;border-radius:5px;display:block;flex-shrink:0}
+.mark-btn[aria-pressed="true"]{border-color:var(--today);background:var(--today-soft);color:var(--today);font-weight:700}
+.mark-btn:focus-visible{outline:2px solid var(--today);outline-offset:2px}
+.mark-btn .sub{margin-left:auto;font-size:11.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+
 footer{
   text-align:center;font-size:11.5px;color:var(--muted);line-height:1.6;
-  display:flex;flex-direction:column;gap:6px;
+  display:flex;flex-direction:column;gap:8px;align-items:center;
 }
-footer .mono{font-size:11px;letter-spacing:.08em}
+footer b{color:var(--text)}
 .offline{
-  display:inline-flex;align-items:center;gap:7px;align-self:center;
+  display:inline-flex;align-items:center;gap:7px;
   border:1px solid var(--line);background:var(--surface);
   border-radius:999px;padding:5px 12px;
   font-family:"IBM Plex Mono",ui-monospace,monospace;
@@ -397,7 +439,6 @@ footer .mono{font-size:11px;letter-spacing:.08em}
 .offline::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .offline.ready{color:var(--today);border-color:var(--today)}
 .offline.ready::before{background:var(--today)}
-footer b{color:var(--text)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -419,6 +460,7 @@ footer b{color:var(--text)}
     <span class="chip"><i class="swD"></i>Day 7 AM – 7 PM</span>
     <span class="chip"><i class="swN"></i>Night 7 PM – 7 AM</span>
     <span class="chip"><i class="swO"></i>Off</span>
+    <span class="chip"><i class="swL"></i>Leave</span>
     <span class="chip"><i class="swH"></i>UAE public holiday</span>
   </div>
 
@@ -440,22 +482,47 @@ footer b{color:var(--text)}
     </div>
   </section>
 
+  <section class="export">
+    <h2>Put your shifts in your phone calendar</h2>
+    <p>Downloads every shift from today to December 2027, each with a reminder one hour before it starts. Open the downloaded file and your phone offers to add it.</p>
+    <a class="btn" id="ics" href="#" download="shift-b.ics">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"></path><path d="M7 11l5 5 5-5"></path><path d="M4 20h16"></path>
+      </svg>
+      Download shift calendar
+    </a>
+  </section>
+
   <div id="months"></div>
+
+  <button class="past-toggle" id="past-toggle" type="button" hidden>Show earlier months</button>
 
   <footer>
     <div>Islamic holidays follow the moon sighting — dates marked <b>expected</b> are confirmed by the UAE government a few days ahead.</div>
+    <div>Tap any day to mark leave or a swap. Marks are saved on your own phone only.</div>
     <div class="offline" id="offline-state" hidden></div>
   </footer>
 </div>
 
-<button class="fab" id="fab" type="button" hidden>
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <rect x="6" y="2" width="12" height="20" rx="3"></rect>
-    <path d="M12 7v7"></path><path d="M9 11l3 3 3-3"></path>
-  </svg>
-  Put it on my phone
-</button>
+<div class="fabs">
+  <button class="fab ghost" id="fab-today" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="3"></rect>
+      <path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path>
+    </svg>
+    Today
+  </button>
+  <button class="fab" id="fab" type="button" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="6" y="2" width="12" height="20" rx="3"></rect>
+      <path d="M12 7v7"></path><path d="M9 11l3 3 3-3"></path>
+    </svg>
+    Install
+  </button>
+</div>
 
 <div class="scrim" id="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
@@ -464,9 +531,9 @@ footer b{color:var(--text)}
       <img id="appicon" class="appicon" src="data:image/png;base64,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" alt="Shift B Calendar app icon" width="56" height="56">
       <h2 id="sheet-title">Add Shift B Calendar to your home screen</h2>
     </div>
-    <p class="lead">It becomes an icon on your phone and opens full screen, like a normal app. Works offline-ish, no account needed.</p>
+    <p class="lead">It becomes an icon on your phone and opens full screen, like a normal app. Once opened with internet, it keeps working without a connection.</p>
 
-    <div class="warn" id="warn-browser">
+    <div class="warn">
       <span class="bang">!</span>
       <span>Opened from WhatsApp, Telegram or Instagram? Tap the <span class="key">⋯</span> menu first and choose <b>Open in browser</b> — it only works in Safari or Chrome.</span>
     </div>
@@ -493,25 +560,48 @@ footer b{color:var(--text)}
   </div>
 </div>
 
+<div class="scrim" id="day-scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="day-title">
+    <div class="sheet-grab"></div>
+    <h2 id="day-title">Day</h2>
+    <p class="lead" id="day-lead">Rostered shift</p>
+    <div class="marks" id="marks"></div>
+    <button class="close" id="day-close" type="button">Close</button>
+  </div>
+</div>
+
 <script>
-(function(){
+(function () {
   "use strict";
 
-  /* ---- shift engine: 2 day / 2 off / 2 night / 2 off ---- */
-  var ANCHOR = Date.UTC(2026, 7, 2);            // Sun 2 Aug 2026 = first day shift
-  var CYCLE  = ["D","D","O","O","N","N","O","O"];
+  /* ================= shift engine ================= */
+  var ANCHOR = Date.UTC(2026, 7, 2);              // Sun 2 Aug 2026 = first day shift
+  var CYCLE  = ["D", "D", "O", "O", "N", "N", "O", "O"];
   var DAY_MS = 86400000;
+  var LAST_Y = 2027, LAST_M = 11;                 // calendar ends Dec 2027
 
-  function codeFor(y, m, d){
+  function baseCode(y, m, d) {
     var i = Math.floor((Date.UTC(y, m, d) - ANCHOR) / DAY_MS) % 8;
     if (i < 0) i += 8;
     return CYCLE[i];
   }
-  function key(y, m, d){
+  function key(y, m, d) {
     return y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
   }
 
-  /* ---- UAE public holidays ---- */
+  /* ================= personal marks ================= */
+  var STORE = "shiftb.marks.v1";
+  var MARKS = {};
+  try { MARKS = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { MARKS = {}; }
+  function saveMarks() {
+    try { localStorage.setItem(STORE, JSON.stringify(MARKS)); } catch (e) {}
+  }
+  function code(y, m, d) {
+    var mk = MARKS[key(y, m, d)];
+    return mk ? mk : baseCode(y, m, d);
+  }
+
+  /* ================= holidays ================= */
   var HOLIDAYS = {
     "2026-08-28": ["Prophet Muhammad's Birthday", 1],
     "2026-12-02": ["Eid Al Etihad — National Day", 1],
@@ -533,171 +623,375 @@ footer b{color:var(--text)}
 
   var MONTHS = ["January","February","March","April","May","June",
                 "July","August","September","October","November","December"];
-  var WD = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var WD  = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   var WD1 = ["M","T","W","T","F","S","S"];
-  var NAME = { D:"Day shift", N:"Night shift", O:"Day off" };
-  var HOURS = { D:"7:00 AM – 7:00 PM", N:"7:00 PM – 7:00 AM", O:"No shift" };
+  var NAME  = { D:"Day shift", N:"Night shift", O:"Day off", L:"Annual leave" };
+  var HOURS = { D:"7:00 AM – 7:00 PM", N:"7:00 PM – 7:00 AM", O:"No shift", L:"On leave" };
 
-  /* ---- today ---- */
   var now = new Date();
   var TY = now.getFullYear(), TM = now.getMonth(), TD = now.getDate();
   var todayKey = key(TY, TM, TD);
 
-  /* ---- status card ---- */
-  function addDays(n){
+  function addDays(n) {
     var d = new Date(TY, TM, TD);
     d.setDate(d.getDate() + n);
     return d;
   }
-  function runLength(startOffset, code){
-    var n = 0;
-    while (n < 12){
-      var d = addDays(startOffset + n);
-      if (codeFor(d.getFullYear(), d.getMonth(), d.getDate()) !== code) break;
+  function wdName(d) { return WD[(d.getDay() + 6) % 7]; }
+
+  /* ================= quote of the day ================= */
+  var QUOTES = [
+    ["People will forget what you said and what you did, but people will never forget how you made them feel.", "Maya Angelou"],
+    ["Sales are contingent upon the attitude of the salesman — not the attitude of the prospect.", "W. Clement Stone"],
+    ["Make a customer, not a sale.", "Katherine Barchetti"],
+    ["Do what you do so well that they will want to see it again and bring their friends.", "Walt Disney"],
+    ["The customer’s perception is your reality.", "Kate Zabriskie"],
+    ["The best advertising is done by satisfied customers.", "Philip Kotler"],
+    ["People don’t buy what you do; they buy why you do it.", "Simon Sinek"],
+    ["You don’t have to be great to start, but you have to start to be great.", "Zig Ziglar"],
+    ["Success is the sum of small efforts, repeated day in and day out.", "Robert Collier"],
+    ["Either you run the day, or the day runs you.", "Jim Rohn"],
+    ["Well done is better than well said.", "Benjamin Franklin"],
+    ["Nothing great was ever achieved without enthusiasm.", "Ralph Waldo Emerson"],
+    ["It always seems impossible until it’s done.", "Nelson Mandela"],
+    ["Little by little, one travels far.", "Spanish proverb"],
+    ["Fall seven times, stand up eight.", "Japanese proverb"]
+  ];
+  (function () {
+    var doy = Math.floor((new Date(TY, TM, TD) - new Date(TY, 0, 0)) / DAY_MS);
+    var q = QUOTES[(doy + TY) % QUOTES.length];
+    document.getElementById("quote").innerHTML =
+      "<blockquote>“" + q[0] + "”</blockquote><figcaption>" + q[1] + "</figcaption>";
+  })();
+
+  /* ================= shift intervals & countdown ================= */
+  function intervalFor(d) {
+    var c = code(d.getFullYear(), d.getMonth(), d.getDate());
+    if (c !== "D" && c !== "N") return null;
+    var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), c === "D" ? 7 : 19, 0, 0, 0);
+    var end = new Date(start.getTime() + 12 * 3600000);
+    return { start: start, end: end, code: c };
+  }
+  function currentOrNext() {
+    var t = Date.now(), cur = null, next = null;
+    for (var i = -1; i <= 12; i++) {
+      var iv = intervalFor(addDays(i));
+      if (!iv) continue;
+      if (iv.start.getTime() <= t && t < iv.end.getTime()) { cur = iv; break; }
+      if (!next && iv.start.getTime() > t) next = iv;
+    }
+    return { cur: cur, next: next };
+  }
+  function human(ms) {
+    var mins = Math.max(0, Math.round(ms / 60000));
+    var h = Math.floor(mins / 60), m = mins % 60;
+    if (h >= 24) {
+      var days = Math.floor(h / 24);
+      return days + (days === 1 ? " day " : " days ") + (h % 24) + " h";
+    }
+    if (h === 0) return m + " min";
+    return h + " h " + m + " min";
+  }
+
+  /* ================= status card ================= */
+  var st = document.getElementById("status");
+  function runAhead() {
+    var tCode = code(TY, TM, TD), n = 1;
+    while (n < 14) {
+      var d = addDays(n);
+      if (code(d.getFullYear(), d.getMonth(), d.getDate()) !== tCode) break;
       n++;
     }
     return n;
   }
+  function renderStatus() {
+    var tCode = code(TY, TM, TD);
+    st.className = "status " +
+      (tCode === "D" ? "is-day" : tCode === "N" ? "is-night" : tCode === "L" ? "is-leave" : "is-off");
 
-  var tCode = codeFor(TY, TM, TD);
-  var st = document.getElementById("status");
-  st.className = "status " + (tCode === "D" ? "is-day" : tCode === "N" ? "is-night" : "is-off");
-
-  // find where the current block ends and what comes next
-  var ahead = 1;
-  while (ahead < 12){
-    var dd = addDays(ahead);
-    if (codeFor(dd.getFullYear(), dd.getMonth(), dd.getDate()) !== tCode) break;
-    ahead++;
-  }
-  var nextDate = addDays(ahead);
-  var nextCode = codeFor(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
-  var nextLen  = runLength(ahead, nextCode);
-  var whenTxt  = ahead === 1 ? "tomorrow" : "in " + ahead + " days";
-  var nextTxt  = nextCode === "O"
-      ? nextLen + " days off"
-      : nextLen + " × " + NAME[nextCode].toLowerCase() + " (" + HOURS[nextCode] + ")";
-
-  var holToday = HOLIDAYS[todayKey];
-
-  st.innerHTML =
-    '<div class="status-top">' +
-      '<div>' +
-        '<div class="status-label">Today</div>' +
-        '<div class="status-shift">' + NAME[tCode] + '</div>' +
-        '<div class="status-hours">' + HOURS[tCode] + '</div>' +
-      '</div>' +
-      '<div class="status-date"><strong>' + TD + '</strong>' +
-        MONTHS[TM].slice(0,3) + ' ' + TY + '<br>' + WD[(new Date(TY,TM,TD).getDay()+6)%7] +
-      '</div>' +
-    '</div>' +
-    '<div class="status-next">Next: <b>' + nextTxt + '</b>, starting ' + whenTxt +
-      ' — ' + WD[(nextDate.getDay()+6)%7] + ' ' + nextDate.getDate() + ' ' + MONTHS[nextDate.getMonth()] +
-      (holToday ? '.<br>Today is a UAE public holiday: <b>' + holToday[0] + '</b>' : '') +
-    '</div>';
-
-  /* ---- next 7 days ---- */
-  var stripEl = document.getElementById("strip");
-  var sHtml = "";
-  for (var i = 0; i < 7; i++){
-    var d = addDays(i);
-    var c = codeFor(d.getFullYear(), d.getMonth(), d.getDate());
-    sHtml += '<div class="s ' + c + '">' +
-       '<div class="wd">' + WD[(d.getDay()+6)%7].slice(0,2) + '</div>' +
-       '<div class="dd">' + d.getDate() + '</div>' +
-       '<div class="cd">' + (c === "O" ? "OFF" : c) + '</div>' +
-     '</div>';
-  }
-  stripEl.innerHTML = sHtml;
-
-  /* ---- months: Aug 2026 → Dec 2027 ---- */
-  var out = [], lastYear = null;
-  var y = 2026, m = 7;
-  while (y < 2027 || (y === 2027 && m <= 11)){
-    if (y !== lastYear){
-      out.push('<div class="year-rule"><span>' + y + '</span></div>');
-      lastYear = y;
+    var ahead = runAhead();
+    var nextDate = addDays(ahead);
+    var nextCode = code(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
+    var len = 1;
+    while (len < 14) {
+      var dd = addDays(ahead + len);
+      if (code(dd.getFullYear(), dd.getMonth(), dd.getDate()) !== nextCode) break;
+      len++;
     }
-    out.push(renderMonth(y, m));
-    m++;
-    if (m > 11){ m = 0; y++; }
+    var blockTxt = nextCode === "O"
+      ? len + " days off"
+      : nextCode === "L" ? len + " days of leave"
+      : len + " × " + NAME[nextCode].toLowerCase();
+
+    var cn = currentOrNext(), countLine;
+    if (cn.cur) {
+      countLine = "On shift now — ends in <b>" + human(cn.cur.end - Date.now()) + "</b>";
+    } else if (cn.next) {
+      countLine = NAME[cn.next.code] + " starts in <b>" + human(cn.next.start - Date.now()) + "</b>" +
+                  " · " + wdName(cn.next.start) + " " + cn.next.start.getDate() + " " + MONTHS[cn.next.start.getMonth()];
+    } else {
+      countLine = "No shift scheduled";
+    }
+
+    var hol = HOLIDAYS[todayKey];
+    st.innerHTML =
+      '<div class="status-top">' +
+        '<div>' +
+          '<div class="status-label">Today</div>' +
+          '<div class="status-shift">' + NAME[tCode] + '</div>' +
+          '<div class="status-hours">' + HOURS[tCode] + '</div>' +
+        '</div>' +
+        '<div class="status-date"><strong>' + TD + '</strong>' +
+          MONTHS[TM].slice(0, 3) + ' ' + TY + '<br>' + wdName(new Date(TY, TM, TD)) +
+        '</div>' +
+      '</div>' +
+      '<div class="status-next">' +
+        '<div class="count">' + countLine + '</div>' +
+        '<div>Then <b>' + blockTxt + '</b> from ' + wdName(nextDate) + ' ' +
+          nextDate.getDate() + ' ' + MONTHS[nextDate.getMonth()] +
+          (hol ? '.<br>Today is a UAE public holiday: <b>' + hol[0] + '</b>' : '') +
+        '</div>' +
+      '</div>';
   }
-  document.getElementById("months").innerHTML = out.join("");
 
-  function renderMonth(yy, mm){
+  /* ================= 7-day strip ================= */
+  var stripEl = document.getElementById("strip");
+  function renderStrip() {
+    var h = "";
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(i);
+      var c = code(d.getFullYear(), d.getMonth(), d.getDate());
+      h += '<div class="s ' + c + '">' +
+             '<div class="wd">' + wdName(d).slice(0, 2) + '</div>' +
+             '<div class="dd">' + d.getDate() + '</div>' +
+             '<div class="cd">' + (c === "O" ? "OFF" : c === "L" ? "LV" : c) + '</div>' +
+           '</div>';
+    }
+    stripEl.innerHTML = h;
+  }
+
+  /* ================= months ================= */
+  var monthsEl = document.getElementById("months");
+  var pastToggle = document.getElementById("past-toggle");
+  var showPast = false;
+
+  function monthHTML(yy, mm) {
     var first = new Date(yy, mm, 1);
-    var lead = (first.getDay() + 6) % 7;                 // Monday-first
+    var lead = (first.getDay() + 6) % 7;
     var days = new Date(yy, mm + 1, 0).getDate();
-    var h = '<div class="month"><div class="mhead">' +
-            '<div class="mname">' + MONTHS[mm] + '</div>';
+    var nD = 0, nN = 0, nL = 0, hols = [];
 
-    var nD = 0, nN = 0, monthHols = [];
-    for (var d = 1; d <= days; d++){
-      var c = codeFor(yy, mm, d);
+    for (var d = 1; d <= days; d++) {
+      var c = code(yy, mm, d);
       if (c === "D") nD++;
       if (c === "N") nN++;
+      if (c === "L") nL++;
       var hk = key(yy, mm, d);
-      if (HOLIDAYS[hk]) monthHols.push([d, HOLIDAYS[hk][0], HOLIDAYS[hk][1]]);
+      if (HOLIDAYS[hk]) hols.push([d, HOLIDAYS[hk][0], HOLIDAYS[hk][1]]);
     }
-    h += '<div class="mstat">' + (nD + nN) + ' shifts · ' + nD + 'D / ' + nN + 'N</div></div>';
 
-    h += '<div class="grid">';
+    var stat = (nD + nN) + " shifts · " + nD + "D / " + nN + "N · " + ((nD + nN) * 12) + " h";
+    if (nL) stat += " · " + nL + " lv";
+
+    var h = '<div class="month" id="m-' + yy + '-' + mm + '">' +
+            '<div class="mhead"><div class="mname">' + MONTHS[mm] + ' ' + yy + '</div>' +
+            '<div class="mstat">' + stat + '</div></div><div class="grid">';
+
     for (var w = 0; w < 7; w++) h += '<div class="wdh">' + WD1[w] + '</div>';
     for (var b = 0; b < lead; b++) h += '<div class="cell blank"></div>';
-    for (var dd2 = 1; dd2 <= days; dd2++){
-      var code = codeFor(yy, mm, dd2);
-      var k = key(yy, mm, dd2);
-      var cls = "cell " + code;
+
+    for (var dd = 1; dd <= days; dd++) {
+      var cc = code(yy, mm, dd), k = key(yy, mm, dd);
+      var cls = "cell " + cc;
       if (HOLIDAYS[k]) cls += " hol";
+      if (MARKS[k]) cls += " edited";
       if (k === todayKey) cls += " today";
-      h += '<div class="' + cls + '"><span class="n">' + dd2 + '</span>' +
-           '<span class="c">' + (code === "O" ? "" : code) + '</span></div>';
+      h += '<button type="button" class="' + cls + '" data-k="' + k + '" ' +
+           'aria-label="' + dd + ' ' + MONTHS[mm] + ', ' + NAME[cc] + '">' +
+           '<span class="n">' + dd + '</span><span class="c">' +
+           (cc === "O" ? "" : cc === "L" ? "LV" : cc) + '</span></button>';
     }
     h += '</div>';
 
-    if (monthHols.length){
-      // collapse consecutive days of the same holiday
+    if (hols.length) {
       var lines = [], cur = null;
-      monthHols.forEach(function(x){
-        if (cur && cur.name === x[1] && x[0] === cur.end + 1){ cur.end = x[0]; }
-        else { cur = { start:x[0], end:x[0], name:x[1], sure:x[2] }; lines.push(cur); }
+      hols.forEach(function (x) {
+        if (cur && cur.name === x[1] && x[0] === cur.end + 1) { cur.end = x[0]; }
+        else { cur = { start: x[0], end: x[0], name: x[1], sure: x[2] }; lines.push(cur); }
       });
       h += '<div class="hols">';
-      lines.forEach(function(l){
+      lines.forEach(function (l) {
         var label = l.start === l.end ? String(l.start) : l.start + "–" + l.end;
-        h += '<div class="hol-line"><span class="hd">' + label + '</span>' +
-             '<span class="hn">' + l.name +
-             (l.sure ? "" : ' <small>· expected</small>') + '</span></div>';
+        h += '<div class="hol-line"><span class="hd">' + label + '</span><span class="hn">' +
+             l.name + (l.sure ? "" : ' <small>· expected</small>') + '</span></div>';
       });
       h += '</div>';
     }
     return h + '</div>';
   }
 
-  /* ---- quote of the day (same for everyone, changes daily) ---- */
-  var QUOTES = [
-    ["People will forget what you said and what you did, but people will never forget how you made them feel.", "Maya Angelou"],
-    ["Sales are contingent upon the attitude of the salesman \u2014 not the attitude of the prospect.", "W. Clement Stone"],
-    ["Make a customer, not a sale.", "Katherine Barchetti"],
-    ["Do what you do so well that they will want to see it again and bring their friends.", "Walt Disney"],
-    ["The customer\u2019s perception is your reality.", "Kate Zabriskie"],
-    ["The best advertising is done by satisfied customers.", "Philip Kotler"],
-    ["People don\u2019t buy what you do; they buy why you do it.", "Simon Sinek"],
-    ["You don\u2019t have to be great to start, but you have to start to be great.", "Zig Ziglar"],
-    ["Success is the sum of small efforts, repeated day in and day out.", "Robert Collier"],
-    ["Either you run the day, or the day runs you.", "Jim Rohn"],
-    ["Well done is better than well said.", "Benjamin Franklin"],
-    ["Nothing great was ever achieved without enthusiasm.", "Ralph Waldo Emerson"],
-    ["It always seems impossible until it\u2019s done.", "Nelson Mandela"],
-    ["Little by little, one travels far.", "Spanish proverb"],
-    ["Fall seven times, stand up eight.", "Japanese proverb"]
-  ];
-  var doy = Math.floor((new Date(TY, TM, TD) - new Date(TY, 0, 0)) / DAY_MS);
-  var q = QUOTES[(doy + TY) % QUOTES.length];
-  document.getElementById("quote").innerHTML =
-    "<blockquote>\u201c" + q[0] + "\u201d</blockquote><figcaption>" + q[1] + "</figcaption>";
+  function renderMonths() {
+    var startY = showPast ? 2026 : TY;
+    var startM = showPast ? 7 : TM;
+    if (!showPast && (startY < 2026 || (startY === 2026 && startM < 7))) { startY = 2026; startM = 7; }
 
-  /* ---- install: floating button + sheet ---- */
+    var out = [], lastYear = null, y = startY, m = startM;
+    while (y < LAST_Y || (y === LAST_Y && m <= LAST_M)) {
+      if (y !== lastYear) { out.push('<div class="year-rule"><span>' + y + '</span></div>'); lastYear = y; }
+      out.push(monthHTML(y, m));
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    monthsEl.innerHTML = out.length ? out.join("") :
+      '<div class="month"><div class="mname">Calendar ends December 2027</div></div>';
+
+    var hasPast = TY > 2026 || (TY === 2026 && TM > 7);
+    pastToggle.hidden = !hasPast;
+    pastToggle.textContent = showPast ? "Hide earlier months" : "Show earlier months";
+  }
+
+  function renderAll() { renderStatus(); renderStrip(); renderMonths(); }
+  renderAll();
+  setInterval(renderStatus, 30000);
+
+  pastToggle.addEventListener("click", function () {
+    showPast = !showPast;
+    renderMonths();
+    if (!showPast) jumpToToday();
+  });
+
+  function jumpToToday() {
+    var el = document.getElementById("m-" + TY + "-" + TM);
+    if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+  document.getElementById("fab-today").addEventListener("click", jumpToToday);
+
+  /* ================= day marks ================= */
+  var dayScrim = document.getElementById("day-scrim");
+  var dayTitle = document.getElementById("day-title");
+  var dayLead  = document.getElementById("day-lead");
+  var marksEl  = document.getElementById("marks");
+  var openKey  = null;
+
+  var OPTIONS = [
+    { v: "",  label: "Rostered (no change)", sw: "swO" },
+    { v: "L", label: "Annual leave",         sw: "swL" },
+    { v: "O", label: "Swapped out — free",   sw: "swO" },
+    { v: "D", label: "Working — day shift",  sw: "swD" },
+    { v: "N", label: "Working — night shift",sw: "swN" }
+  ];
+
+  monthsEl.addEventListener("click", function (ev) {
+    var btn = ev.target.closest ? ev.target.closest(".cell") : null;
+    if (!btn || btn.classList.contains("blank")) return;
+    openKey = btn.getAttribute("data-k");
+    if (!openKey) return;
+    var p = openKey.split("-");
+    var yy = +p[0], mm = +p[1] - 1, dd = +p[2];
+    dayTitle.textContent = dd + " " + MONTHS[mm] + " " + yy;
+    dayLead.textContent = "Rostered: " + NAME[baseCode(yy, mm, dd)];
+    var cur = MARKS[openKey] || "";
+    marksEl.innerHTML = OPTIONS.map(function (o) {
+      return '<button type="button" class="mark-btn" data-v="' + o.v + '" aria-pressed="' +
+             (cur === o.v ? "true" : "false") + '"><i class="' + o.sw + '"></i>' + o.label +
+             (o.v === "" ? '<span class="sub">' + baseCode(yy, mm, dd) + '</span>' : '') + '</button>';
+    }).join("");
+    dayScrim.hidden = false;
+  });
+
+  marksEl.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".mark-btn") : null;
+    if (!b || !openKey) return;
+    var v = b.getAttribute("data-v");
+    if (v) MARKS[openKey] = v; else delete MARKS[openKey];
+    saveMarks();
+    dayScrim.hidden = true;
+    openKey = null;
+    renderAll();
+  });
+
+  document.getElementById("day-close").addEventListener("click", function () { dayScrim.hidden = true; });
+  dayScrim.addEventListener("click", function (ev) { if (ev.target === dayScrim) dayScrim.hidden = true; });
+
+  /* ================= .ics export ================= */
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function utcStamp(d) {
+    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
+           pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
+  }
+  function buildICS() {
+    var L = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Shift B Calendar//EN",
+      "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "X-WR-CALNAME:Shift B", "X-WR-TIMEZONE:Asia/Dubai",
+      "BEGIN:VTIMEZONE", "TZID:Asia/Dubai",
+      "BEGIN:STANDARD", "DTSTART:19700101T000000",
+      "TZOFFSETFROM:+0400", "TZOFFSETTO:+0400", "TZNAME:+04",
+      "END:STANDARD", "END:VTIMEZONE"
+    ];
+    var stamp = utcStamp(new Date());
+    var cur = new Date(TY, TM, TD);
+    var end = new Date(LAST_Y, LAST_M + 1, 0);
+
+    while (cur <= end) {
+      var y = cur.getFullYear(), m = cur.getMonth(), d = cur.getDate();
+      var k = key(y, m, d), c = code(y, m, d);
+
+      if (c === "D" || c === "N") {
+        var startH = c === "D" ? 7 : 19;
+        var endD = new Date(y, m, d + (c === "D" ? 0 : 1));
+        var startLocal = y + pad(m + 1) + pad(d) + "T" + pad(startH) + "0000";
+        var endLocal = endD.getFullYear() + pad(endD.getMonth() + 1) + pad(endD.getDate()) +
+                       "T" + pad(c === "D" ? 19 : 7) + "0000";
+        L.push("BEGIN:VEVENT");
+        L.push("UID:shiftb-" + k + "-" + c + "@shift-b");
+        L.push("DTSTAMP:" + stamp);
+        L.push("DTSTART;TZID=Asia/Dubai:" + startLocal);
+        L.push("DTEND;TZID=Asia/Dubai:" + endLocal);
+        L.push("SUMMARY:" + (c === "D" ? "Day shift 7 AM – 7 PM" : "Night shift 7 PM – 7 AM"));
+        L.push("BEGIN:VALARM", "TRIGGER:-PT1H", "ACTION:DISPLAY",
+               "DESCRIPTION:Shift starts in one hour", "END:VALARM");
+        L.push("END:VEVENT");
+      } else if (c === "L") {
+        var nx = new Date(y, m, d + 1);
+        L.push("BEGIN:VEVENT");
+        L.push("UID:shiftb-" + k + "-L@shift-b");
+        L.push("DTSTAMP:" + stamp);
+        L.push("DTSTART;VALUE=DATE:" + y + pad(m + 1) + pad(d));
+        L.push("DTEND;VALUE=DATE:" + nx.getFullYear() + pad(nx.getMonth() + 1) + pad(nx.getDate()));
+        L.push("SUMMARY:Annual leave", "TRANSP:TRANSPARENT", "END:VEVENT");
+      }
+
+      if (HOLIDAYS[k]) {
+        var nx2 = new Date(y, m, d + 1);
+        L.push("BEGIN:VEVENT");
+        L.push("UID:shiftb-hol-" + k + "@shift-b");
+        L.push("DTSTAMP:" + stamp);
+        L.push("DTSTART;VALUE=DATE:" + y + pad(m + 1) + pad(d));
+        L.push("DTEND;VALUE=DATE:" + nx2.getFullYear() + pad(nx2.getMonth() + 1) + pad(nx2.getDate()));
+        L.push("SUMMARY:UAE holiday — " + HOLIDAYS[k][0].replace(/,/g, ""));
+        L.push("TRANSP:TRANSPARENT", "END:VEVENT");
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+    L.push("END:VCALENDAR");
+    return L.join("\r\n") + "\r\n";
+  }
+
+  var icsLink = document.getElementById("ics");
+  var icsURL = null;
+  icsLink.addEventListener("click", function (ev) {
+    try {
+      if (icsURL) URL.revokeObjectURL(icsURL);
+      var blob = new Blob([buildICS()], { type: "text/calendar;charset=utf-8" });
+      icsURL = URL.createObjectURL(blob);
+      icsLink.href = icsURL;
+    } catch (e) {
+      ev.preventDefault();
+      alert("Could not build the calendar file on this browser.");
+    }
+  });
+
+  /* ================= install sheet ================= */
   var fab   = document.getElementById("fab"),
       scrim = document.getElementById("scrim"),
       pIos  = document.getElementById("p-ios"),
@@ -707,46 +1001,41 @@ footer b{color:var(--text)}
       go    = document.getElementById("go"),
       closeBtn = document.getElementById("close");
 
-  var ua = navigator.userAgent || "";
-  var isAndroid = /Android/i.test(ua);
+  var isAndroid = /Android/i.test(navigator.userAgent || "");
   var installed = false;
   try {
     installed = window.navigator.standalone === true ||
                 (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
   } catch (e) {}
 
-  function pick(ios){
+  function pick(ios) {
     pIos.setAttribute("aria-selected", ios ? "true" : "false");
     pAnd.setAttribute("aria-selected", ios ? "false" : "true");
     sIos.hidden = !ios; sAnd.hidden = ios;
   }
   pick(!isAndroid);
-  pIos.addEventListener("click", function(){ pick(true); });
-  pAnd.addEventListener("click", function(){ pick(false); });
+  pIos.addEventListener("click", function () { pick(true); });
+  pAnd.addEventListener("click", function () { pick(false); });
 
-  function openSheet(){ scrim.hidden = false; }
-  function closeSheet(){ scrim.hidden = true; }
-  fab.addEventListener("click", openSheet);
+  function closeSheet() { scrim.hidden = true; }
+  fab.addEventListener("click", function () { scrim.hidden = false; });
   closeBtn.addEventListener("click", closeSheet);
-  scrim.addEventListener("click", function(ev){ if (ev.target === scrim) closeSheet(); });
-  document.addEventListener("keydown", function(ev){ if (ev.key === "Escape") closeSheet(); });
-
+  scrim.addEventListener("click", function (ev) { if (ev.target === scrim) closeSheet(); });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { closeSheet(); dayScrim.hidden = true; }
+  });
   if (!installed) fab.hidden = false;
 
-  /* real one-tap install where the browser allows it (Android/Chrome) */
   var deferred = null;
-  window.addEventListener("beforeinstallprompt", function(ev){
-    ev.preventDefault();
-    deferred = ev;
-    go.hidden = false;
+  window.addEventListener("beforeinstallprompt", function (ev) {
+    ev.preventDefault(); deferred = ev; go.hidden = false;
   });
-  go.addEventListener("click", function(){
+  go.addEventListener("click", function () {
     if (!deferred) return;
     deferred.prompt();
-    deferred.userChoice.then(function(){ deferred = null; go.hidden = true; closeSheet(); });
+    deferred.userChoice.then(function () { deferred = null; go.hidden = true; closeSheet(); });
   });
-  window.addEventListener("appinstalled", function(){ fab.hidden = true; closeSheet(); });
-
+  window.addEventListener("appinstalled", function () { fab.hidden = true; closeSheet(); });
 })();
 </script>
 
@@ -757,11 +1046,9 @@ footer b{color:var(--text)}
     if (!el) return;
     el.hidden = false;
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      el.className = "offline ready";
-      el.textContent = "Offline ready";
+      el.className = "offline ready"; el.textContent = "Offline ready";
     } else {
-      el.className = "offline";
-      el.textContent = "Preparing offline\u2026";
+      el.className = "offline"; el.textContent = "Preparing offline\u2026";
     }
   }
   if (!("serviceWorker" in navigator)) return;
@@ -769,9 +1056,7 @@ footer b{color:var(--text)}
   navigator.serviceWorker.addEventListener("controllerchange", paint);
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("sw.js").then(function () {
-      paint();
-      setTimeout(paint, 1500);
-      setTimeout(paint, 5000);
+      paint(); setTimeout(paint, 1500); setTimeout(paint, 5000);
     }).catch(function () {
       if (el) { el.hidden = false; el.className = "offline"; el.textContent = "Offline unavailable"; }
     });

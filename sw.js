@@ -1,4 +1,4 @@
-const CACHE = "shift-b-v2";
+const CACHE = "shift-b-v3";
 const CORE = ["./", "./index.html", "./manifest.webmanifest"];
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
@@ -35,18 +35,12 @@ self.addEventListener("fetch", (e) => {
 
     const fromNetwork = fetch(req)
       .then((res) => {
-        if (res && (res.ok || res.type === "opaque")) {
-          cache.put(req, res.clone()).catch(() => {});
-        }
+        if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone()).catch(() => {});
         return res;
       })
       .catch(() => null);
 
-    // Cache first: instant, and works with no connection at all.
-    if (cached) {
-      e.waitUntil(fromNetwork);
-      return cached;
-    }
+    if (cached) { e.waitUntil(fromNetwork); return cached; }
 
     const fresh = await fromNetwork;
     if (fresh) return fresh;
