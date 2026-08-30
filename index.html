@@ -387,6 +387,16 @@ footer{
   display:flex;flex-direction:column;gap:6px;
 }
 footer .mono{font-size:11px;letter-spacing:.08em}
+.offline{
+  display:inline-flex;align-items:center;gap:7px;align-self:center;
+  border:1px solid var(--line);background:var(--surface);
+  border-radius:999px;padding:5px 12px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+}
+.offline::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.offline.ready{color:var(--today);border-color:var(--today)}
+.offline.ready::before{background:var(--today)}
 footer b{color:var(--text)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -434,6 +444,7 @@ footer b{color:var(--text)}
 
   <footer>
     <div>Islamic holidays follow the moon sighting — dates marked <b>expected</b> are confirmed by the UAE government a few days ahead.</div>
+    <div class="offline" id="offline-state" hidden></div>
   </footer>
 </div>
 
@@ -740,11 +751,33 @@ footer b{color:var(--text)}
 </script>
 
 <script>
-if ("serviceWorker" in navigator) {
+(function () {
+  var el = document.getElementById("offline-state");
+  function paint() {
+    if (!el) return;
+    el.hidden = false;
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      el.className = "offline ready";
+      el.textContent = "Offline ready";
+    } else {
+      el.className = "offline";
+      el.textContent = "Preparing offline\u2026";
+    }
+  }
+  if (!("serviceWorker" in navigator)) return;
+  paint();
+  navigator.serviceWorker.addEventListener("controllerchange", paint);
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    navigator.serviceWorker.register("sw.js").then(function () {
+      paint();
+      setTimeout(paint, 1500);
+      setTimeout(paint, 5000);
+    }).catch(function () {
+      if (el) { el.hidden = false; el.className = "offline"; el.textContent = "Offline unavailable"; }
+    });
   });
-}
+})();
 </script>
+
 </body>
 </html>
