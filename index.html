@@ -174,6 +174,40 @@ h1{
   font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-.02em;
   margin:0;text-wrap:balance;
 }
+.shift-pill{
+  align-self:flex-start;
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--today);background:var(--today-soft);color:var(--today);
+  border-radius:999px;padding:6px 14px;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+}
+.shift-pill:focus-visible{outline:2px solid var(--today);outline-offset:3px}
+
+.shift-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.shift-opt{
+  display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  border:1px solid var(--line);background:transparent;color:var(--text);
+  border-radius:14px;padding:13px 14px;cursor:pointer;text-align:left;
+}
+.shift-opt .sl{
+  font-family:"Bricolage Grotesque","Public Sans",sans-serif;
+  font-weight:800;font-size:24px;line-height:1;
+}
+.shift-opt .st{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+}
+.shift-opt.D{background:var(--day-bg);border-color:var(--day-line)}
+.shift-opt.D .sl,.shift-opt.D .st{color:var(--day)}
+.shift-opt.N{background:var(--night-bg);border-color:var(--night-line)}
+.shift-opt.N .sl,.shift-opt.N .st{color:var(--night)}
+.shift-opt[aria-pressed="true"]{outline:2px solid var(--today);outline-offset:1px}
+.shift-opt:focus-visible{outline:2px solid var(--today);outline-offset:2px}
+
+.duty{color:var(--muted)}
+.duty b{color:var(--text)}
+
 .credit{
   font-size:13px;line-height:1.5;color:var(--muted);
   max-width:36ch;text-wrap:pretty;margin-top:-2px;
@@ -367,9 +401,9 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
   content:"";position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;
   background:var(--holiday);
 }
-.cell.edited::before{
+.cell.noted::before{
   content:"";position:absolute;left:5px;top:5px;width:0;height:0;
-  border-left:6px solid currentColor;border-bottom:6px solid transparent;opacity:.75;
+  border-left:7px solid currentColor;border-bottom:7px solid transparent;opacity:.8;
 }
 .cell.today{outline:2px solid var(--today);outline-offset:1px}
 .cell.today .n{color:var(--today)}
@@ -488,6 +522,23 @@ a.c-row:focus-visible{outline:2px solid var(--today);outline-offset:3px;border-r
 .mark-btn[aria-pressed="true"]{border-color:var(--today);background:var(--today-soft);color:var(--today);font-weight:700}
 .mark-btn:focus-visible{outline:2px solid var(--today);outline-offset:2px}
 .mark-btn .sub{margin-left:auto;font-size:11.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.note-label{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:-6px;
+}
+.note-input{
+  width:100%;resize:vertical;min-height:76px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--text);
+  border-radius:13px;padding:12px 13px;
+  font-family:"Public Sans",sans-serif;font-size:15px;line-height:1.45;
+}
+.note-input::placeholder{color:var(--muted)}
+.note-input:focus-visible{outline:2px solid var(--today);outline-offset:1px}
+.note-line{
+  display:flex;gap:8px;align-items:flex-start;color:var(--text);
+}
+.note-line .pin{color:var(--today);flex-shrink:0}
 
 footer{
   text-align:center;font-size:11.5px;color:var(--muted);line-height:1.6;
@@ -511,8 +562,9 @@ footer b{color:var(--text)}
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Roster · 2 on / 2 off · Dubai time</div>
-    <h1>Shift B Calendar</h1>
+    <div class="eyebrow">Terminal 2 · 2 on / 2 off · Dubai time</div>
+    <h1 id="page-title">Shift B Calendar</h1>
+    <button class="shift-pill" id="shift-pill" type="button">Shift B <span aria-hidden="true">▾</span></button>
     <div class="credit">Made by the best team — <b>Terminal 2, Shift B</b>. For your convenience.</div>
   </header>
 
@@ -562,7 +614,7 @@ footer b{color:var(--text)}
 
   <footer>
     <div>Islamic holidays follow the moon sighting — dates marked <b>expected</b> are confirmed by the UAE government a few days ahead.</div>
-    <div>Tap any day to mark leave or a swap. Marks are saved on your own phone only.</div>
+    <div>Tap any day to mark leave or leave yourself a note. Saved on your own phone only.</div>
     <div class="offline" id="offline-state" hidden></div>
   </footer>
 </div>
@@ -622,12 +674,26 @@ footer b{color:var(--text)}
   </div>
 </div>
 
+<div class="scrim" id="pick-scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pick-title">
+    <div class="sheet-grab"></div>
+    <h2 id="pick-title">Which shift are you on?</h2>
+    <p class="lead">Pick your team once and the whole calendar switches to it — shifts, countdown, hours and the calendar export. You can change it any time from the button under the title.</p>
+    <div class="shift-grid" id="shift-grid"></div>
+    <button class="close" id="pick-close" type="button" hidden>Close</button>
+  </div>
+</div>
+
 <div class="scrim" id="day-scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="day-title">
     <div class="sheet-grab"></div>
     <h2 id="day-title">Day</h2>
     <p class="lead" id="day-lead">Rostered shift</p>
     <div class="marks" id="marks"></div>
+    <label class="note-label" for="day-note">Note or reminder</label>
+    <textarea id="day-note" class="note-input" rows="3" maxlength="280"
+              placeholder="Swap with Ali, bring passport, training at 10…"></textarea>
+    <button class="go" id="day-save" type="button">Save</button>
     <button class="close" id="day-close" type="button">Close</button>
   </div>
 </div>
@@ -642,22 +708,54 @@ footer b{color:var(--text)}
   var DAY_MS = 86400000;
   var LAST_Y = 2027, LAST_M = 11;                 // calendar ends Dec 2027
 
-  function baseCode(y, m, d) {
-    var i = Math.floor((Date.UTC(y, m, d) - ANCHOR) / DAY_MS) % 8;
+  // Four teams, same rhythm, two days apart. Verified against the live roster:
+  // Thu 3 Sep 2026 — day B / night C; Sat 5 Sep — day A / night D.
+  var SHIFTS = { A: 2, B: 0, C: 4, D: 6 };
+  var SHIFT_KEY = "shiftb.shift";
+  var SHIFT = "B", chosen = false;
+  try {
+    var saved = localStorage.getItem(SHIFT_KEY);
+    if (saved && SHIFTS[saved] !== undefined) { SHIFT = saved; chosen = true; }
+  } catch (e) {}
+
+  function baseCode(y, m, d, sh) {
+    var i = (Math.floor((Date.UTC(y, m, d) - ANCHOR) / DAY_MS) - SHIFTS[sh || SHIFT]) % 8;
     if (i < 0) i += 8;
     return CYCLE[i];
+  }
+
+  function onDuty(y, m, d) {
+    var out = { day: "—", night: "—" };
+    for (var k in SHIFTS) {
+      var c = baseCode(y, m, d, k);
+      if (c === "D") out.day = k;
+      if (c === "N") out.night = k;
+    }
+    return out;
   }
   function key(y, m, d) {
     return y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
   }
 
   /* ================= personal marks ================= */
-  var STORE = "shiftb.marks.v1";
-  var MARKS = {};
-  try { MARKS = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { MARKS = {}; }
-  function saveMarks() {
-    try { localStorage.setItem(STORE, JSON.stringify(MARKS)); } catch (e) {}
+  var MARKS = {}, NOTES = {};
+  function marksKey() { return "shiftb.marks." + SHIFT; }
+  function notesKey() { return "shiftb.notes." + SHIFT; }
+
+  function loadMarks() {
+    try { MARKS = JSON.parse(localStorage.getItem(marksKey()) || "{}") || {}; }
+    catch (e) { MARKS = {}; }
+    for (var k in MARKS) { if (MARKS[k] !== "L") delete MARKS[k]; }   // only leave is kept
+    try { NOTES = JSON.parse(localStorage.getItem(notesKey()) || "{}") || {}; }
+    catch (e) { NOTES = {}; }
   }
+  function saveMarks() {
+    try {
+      localStorage.setItem(marksKey(), JSON.stringify(MARKS));
+      localStorage.setItem(notesKey(), JSON.stringify(NOTES));
+    } catch (e) {}
+  }
+  loadMarks();
   function code(y, m, d) {
     var mk = MARKS[key(y, m, d)];
     return mk ? mk : baseCode(y, m, d);
@@ -700,6 +798,11 @@ footer b{color:var(--text)}
     return d;
   }
   function wdName(d) { return WD[(d.getDay() + 6) % 7]; }
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
 
   /* ================= quote of the day ================= */
   var QUOTES = [
@@ -805,6 +908,7 @@ footer b{color:var(--text)}
       : len + " × " + NAME[nextCode].toLowerCase();
 
     var hol = HOLIDAYS[todayKey];
+    var duty = onDuty(TY, TM, TD);
     st.innerHTML =
       '<div class="status-top">' +
         '<div>' +
@@ -822,6 +926,12 @@ footer b{color:var(--text)}
           nextDate.getDate() + ' ' + MONTHS[nextDate.getMonth()] +
           (hol ? '.<br>Today is a UAE public holiday: <b>' + hol[0] + '</b>' : '') +
         '</div>' +
+        '<div class="duty">On duty today — day <b>Shift ' + duty.day +
+          '</b>, night <b>Shift ' + duty.night + '</b></div>' +
+        (NOTES[todayKey]
+          ? '<div class="note-line"><span class="pin">✱</span><span>' +
+            esc(NOTES[todayKey]) + '</span></div>'
+          : '') +
       '</div>';
   }
 
@@ -900,7 +1010,7 @@ footer b{color:var(--text)}
       var cc = code(yy, mm, dd), k = key(yy, mm, dd);
       var cls = "cell " + cc;
       if (HOLIDAYS[k]) cls += " hol";
-      if (MARKS[k]) cls += " edited";
+      if (NOTES[k]) cls += " noted";
       if (k === todayKey) cls += " today";
       h += '<button type="button" class="' + cls + '" data-k="' + k + '" ' +
            'aria-label="' + dd + ' ' + MONTHS[mm] + ', ' + NAME[cc] + '">' +
@@ -945,7 +1055,17 @@ footer b{color:var(--text)}
     pastToggle.textContent = showPast ? "Hide earlier months" : "Show earlier months";
   }
 
+  function paintShiftUI() {
+    document.getElementById("page-title").textContent = "Shift " + SHIFT + " Calendar";
+    document.getElementById("shift-pill").innerHTML =
+      "Shift " + SHIFT + ' <span aria-hidden="true">▾</span>';
+    document.title = "Shift " + SHIFT + " Calendar";
+    var dl = document.getElementById("ics");
+    if (dl) dl.setAttribute("download", "shift-" + SHIFT.toLowerCase() + ".ics");
+  }
+
   function renderAll() { renderStatus(); tickCount(); renderStrip(); renderMonths(); }
+  paintShiftUI();
   renderAll();
 
   setInterval(function () {
@@ -979,11 +1099,10 @@ footer b{color:var(--text)}
 
   var OPTIONS = [
     { v: "",  label: "Rostered (no change)", sw: "swO" },
-    { v: "L", label: "Annual leave",         sw: "swL" },
-    { v: "O", label: "Swapped out — free",   sw: "swO" },
-    { v: "D", label: "Working — day shift",  sw: "swD" },
-    { v: "N", label: "Working — night shift",sw: "swN" }
+    { v: "L", label: "Annual leave",         sw: "swL" }
   ];
+  var draftMark = "";
+  var noteInput = document.getElementById("day-note");
 
   monthsEl.addEventListener("click", function (ev) {
     var btn = ev.target.closest ? ev.target.closest(".cell") : null;
@@ -993,21 +1112,36 @@ footer b{color:var(--text)}
     var p = openKey.split("-");
     var yy = +p[0], mm = +p[1] - 1, dd = +p[2];
     dayTitle.textContent = dd + " " + MONTHS[mm] + " " + yy;
-    dayLead.textContent = "Rostered: " + NAME[baseCode(yy, mm, dd)];
-    var cur = MARKS[openKey] || "";
-    marksEl.innerHTML = OPTIONS.map(function (o) {
-      return '<button type="button" class="mark-btn" data-v="' + o.v + '" aria-pressed="' +
-             (cur === o.v ? "true" : "false") + '"><i class="' + o.sw + '"></i>' + o.label +
-             (o.v === "" ? '<span class="sub">' + baseCode(yy, mm, dd) + '</span>' : '') + '</button>';
-    }).join("");
+    var od = onDuty(yy, mm, dd);
+    dayLead.innerHTML = "Your roster: <b>" + NAME[baseCode(yy, mm, dd)] + "</b><br>" +
+      "That day — day shift <b>" + od.day + "</b>, night shift <b>" + od.night + "</b>";
+    draftMark = MARKS[openKey] || "";
+    paintMarks(baseCode(yy, mm, dd));
+    noteInput.value = NOTES[openKey] || "";
     dayScrim.hidden = false;
   });
+
+  function paintMarks(rosterCode) {
+    marksEl.innerHTML = OPTIONS.map(function (o) {
+      return '<button type="button" class="mark-btn" data-v="' + o.v + '" aria-pressed="' +
+             (draftMark === o.v ? "true" : "false") + '"><i class="' + o.sw + '"></i>' + o.label +
+             (o.v === "" ? '<span class="sub">' + rosterCode + '</span>' : '') + '</button>';
+    }).join("");
+  }
 
   marksEl.addEventListener("click", function (ev) {
     var b = ev.target.closest ? ev.target.closest(".mark-btn") : null;
     if (!b || !openKey) return;
-    var v = b.getAttribute("data-v");
-    if (v) MARKS[openKey] = v; else delete MARKS[openKey];
+    draftMark = b.getAttribute("data-v");
+    var p = openKey.split("-");
+    paintMarks(baseCode(+p[0], +p[1] - 1, +p[2]));
+  });
+
+  document.getElementById("day-save").addEventListener("click", function () {
+    if (!openKey) return;
+    if (draftMark) MARKS[openKey] = draftMark; else delete MARKS[openKey];
+    var txt = noteInput.value.trim();
+    if (txt) NOTES[openKey] = txt; else delete NOTES[openKey];
     saveMarks();
     dayScrim.hidden = true;
     openKey = null;
@@ -1019,6 +1153,13 @@ footer b{color:var(--text)}
 
   /* ================= .ics export ================= */
   function pad(n) { return String(n).padStart(2, "0"); }
+  function icsText(t) {
+    return String(t)
+      .replace(/\\/g, "\\\\")
+      .replace(/;/g, "\\;")
+      .replace(/,/g, "\\,")
+      .replace(/\r?\n/g, "\\n");
+  }
   function utcStamp(d) {
     return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
            pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
@@ -1027,7 +1168,7 @@ footer b{color:var(--text)}
     var L = [
       "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Shift B Calendar//EN",
       "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-      "X-WR-CALNAME:Shift B", "X-WR-TIMEZONE:Asia/Dubai",
+      "X-WR-CALNAME:Shift " + SHIFT, "X-WR-TIMEZONE:Asia/Dubai",
       "BEGIN:VTIMEZONE", "TZID:Asia/Dubai",
       "BEGIN:STANDARD", "DTSTART:19700101T000000",
       "TZOFFSETFROM:+0400", "TZOFFSETTO:+0400", "TZNAME:+04",
@@ -1048,22 +1189,33 @@ footer b{color:var(--text)}
         var endLocal = endD.getFullYear() + pad(endD.getMonth() + 1) + pad(endD.getDate()) +
                        "T" + pad(c === "D" ? 19 : 7) + "0000";
         L.push("BEGIN:VEVENT");
-        L.push("UID:shiftb-" + k + "-" + c + "@shift-b");
+        L.push("UID:shift" + SHIFT + "-" + k + "-" + c + "@shift-b");
         L.push("DTSTAMP:" + stamp);
         L.push("DTSTART;TZID=Asia/Dubai:" + startLocal);
         L.push("DTEND;TZID=Asia/Dubai:" + endLocal);
-        L.push("SUMMARY:" + (c === "D" ? "Day shift 7 AM – 7 PM" : "Night shift 7 PM – 7 AM"));
+        L.push("SUMMARY:" + (c === "D" ? "Day shift 7 AM – 7 PM" : "Night shift 7 PM – 7 AM") + " · Shift " + SHIFT);
         L.push("BEGIN:VALARM", "TRIGGER:-PT1H", "ACTION:DISPLAY",
                "DESCRIPTION:Shift starts in one hour", "END:VALARM");
         L.push("END:VEVENT");
       } else if (c === "L") {
         var nx = new Date(y, m, d + 1);
         L.push("BEGIN:VEVENT");
-        L.push("UID:shiftb-" + k + "-L@shift-b");
+        L.push("UID:shift" + SHIFT + "-" + k + "-L@shift-b");
         L.push("DTSTAMP:" + stamp);
         L.push("DTSTART;VALUE=DATE:" + y + pad(m + 1) + pad(d));
         L.push("DTEND;VALUE=DATE:" + nx.getFullYear() + pad(nx.getMonth() + 1) + pad(nx.getDate()));
         L.push("SUMMARY:Annual leave", "TRANSP:TRANSPARENT", "END:VEVENT");
+      }
+
+      if (NOTES[k]) {
+        var nn = new Date(y, m, d + 1);
+        L.push("BEGIN:VEVENT");
+        L.push("UID:shift" + SHIFT + "-" + k + "-note@shift-b");
+        L.push("DTSTAMP:" + stamp);
+        L.push("DTSTART;VALUE=DATE:" + y + pad(m + 1) + pad(d));
+        L.push("DTEND;VALUE=DATE:" + nn.getFullYear() + pad(nn.getMonth() + 1) + pad(nn.getDate()));
+        L.push("SUMMARY:" + icsText(NOTES[k]));
+        L.push("TRANSP:TRANSPARENT", "END:VEVENT");
       }
 
       if (HOLIDAYS[k]) {
@@ -1096,6 +1248,44 @@ footer b{color:var(--text)}
     }
   });
 
+  /* ================= shift picker ================= */
+  var pickScrim = document.getElementById("pick-scrim");
+  var shiftGrid = document.getElementById("shift-grid");
+  var pickClose = document.getElementById("pick-close");
+  var shiftPill = document.getElementById("shift-pill");
+
+  function renderPicker() {
+    shiftGrid.innerHTML = ["A", "B", "C", "D"].map(function (k) {
+      var c = baseCode(TY, TM, TD, k);
+      var t = c === "D" ? "Day today" : c === "N" ? "Night today" : "Off today";
+      return '<button type="button" class="shift-opt ' + c + '" data-s="' + k + '" ' +
+             'aria-pressed="' + (k === SHIFT ? "true" : "false") + '">' +
+             '<span class="sl">' + k + '</span><span class="st">' + t + '</span></button>';
+    }).join("");
+  }
+  function openPicker() {
+    renderPicker();
+    pickClose.hidden = !chosen;
+    pickScrim.hidden = false;
+  }
+  shiftGrid.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".shift-opt") : null;
+    if (!b) return;
+    SHIFT = b.getAttribute("data-s");
+    chosen = true;
+    try { localStorage.setItem(SHIFT_KEY, SHIFT); } catch (e) {}
+    loadMarks();
+    paintShiftUI();
+    renderAll();
+    pickScrim.hidden = true;
+  });
+  shiftPill.addEventListener("click", openPicker);
+  pickClose.addEventListener("click", function () { if (chosen) pickScrim.hidden = true; });
+  pickScrim.addEventListener("click", function (ev) {
+    if (ev.target === pickScrim && chosen) pickScrim.hidden = true;
+  });
+  if (!chosen) openPicker();
+
   /* ================= install sheet ================= */
   var fab   = document.getElementById("fab"),
       scrim = document.getElementById("scrim"),
@@ -1127,7 +1317,11 @@ footer b{color:var(--text)}
   closeBtn.addEventListener("click", closeSheet);
   scrim.addEventListener("click", function (ev) { if (ev.target === scrim) closeSheet(); });
   document.addEventListener("keydown", function (ev) {
-    if (ev.key === "Escape") { closeSheet(); dayScrim.hidden = true; }
+    if (ev.key === "Escape") {
+      closeSheet();
+      dayScrim.hidden = true;
+      if (chosen) pickScrim.hidden = true;
+    }
   });
   if (!installed) fab.hidden = false;
 
