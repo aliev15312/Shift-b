@@ -174,6 +174,12 @@ h1{
   font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-.02em;
   margin:0;text-wrap:balance;
 }
+.credit{
+  font-size:13px;line-height:1.5;color:var(--muted);
+  max-width:36ch;text-wrap:pretty;margin-top:-2px;
+}
+.credit b{font-weight:600;color:var(--today)}
+
 .quote{
   margin:0;position:relative;
   background:var(--surface);border:1px solid var(--line);border-radius:18px;
@@ -507,6 +513,7 @@ footer b{color:var(--text)}
   <header>
     <div class="eyebrow">Roster · 2 on / 2 off · Dubai time</div>
     <h1>Shift B Calendar</h1>
+    <div class="credit">Made by the best team — <b>Terminal 2, Shift B</b>. For your convenience.</div>
   </header>
 
   <figure class="quote" id="quote"></figure>
@@ -524,7 +531,7 @@ footer b{color:var(--text)}
   </div>
 
   <section class="contacts">
-    <div class="c-hd">Duty contacts</div>
+    <div class="c-hd">Duty contact</div>
     <a class="c-row" href="tel:045042620">
       <span class="c-role">DO&rsquo;s office</span>
       <span class="c-val">04 504 2620</span>
@@ -535,10 +542,6 @@ footer b{color:var(--text)}
         </svg>
       </span>
     </a>
-    <div class="c-row">
-      <span class="c-role">DM</span>
-      <span class="c-val">Ciprian Mazilu</span>
-    </div>
   </section>
 
   <section class="export">
